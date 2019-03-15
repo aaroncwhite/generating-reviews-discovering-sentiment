@@ -1,3 +1,10 @@
+# Garbage I don't want
+.vscode
+.ipynb_checkpoints
+
+# ignore notebooks by default unless explicitly overriden
+*.ipynb 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
