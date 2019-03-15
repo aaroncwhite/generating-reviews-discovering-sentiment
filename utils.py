@@ -43,7 +43,6 @@ def sst_binary(data_dir='data/'):
     teX, teY = load_sst(os.path.join(data_dir, 'test_binary_sent.csv'))
     return trX, vaX, teX, trY, vaY, teY
 
-import HTMLParser
 
 def find_trainable_variables(key):
     return tf.get_collection(
@@ -51,10 +50,10 @@ def find_trainable_variables(key):
 
 
 def preprocess(text, front_pad='\n ', end_pad=' '):
-    text = HTMLParser.HTMLParser().unescape(text)
-    text = text.replace('\n', ' ').replace('\\n', ' ').strip()
+    text = html.unescape(text)
+    text = text.replace('\n', ' ').strip()
     text = front_pad+text+end_pad
-    text = text.encode('utf-8')
+    text = text.encode()
     return text
 
 
