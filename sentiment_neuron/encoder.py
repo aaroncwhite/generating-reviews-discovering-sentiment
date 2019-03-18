@@ -4,6 +4,18 @@ import tensorflow as tf
 import os
 from tqdm import tqdm
 from sklearn.externals import joblib
+import logging
+import sys
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+handler.setFormatter(formatter)
+log.addHandler(handler)
+
 
 from .utils import HParams, preprocess, iter_data
 
@@ -151,6 +163,7 @@ def batch_pad(xs, nbatch, nsteps, mode='pre'):
 class Model(object):
 
     def __init__(self, nbatch=128, nsteps=64):
+        import pdb; pdb.set_trace()
         global hps
         hps = HParams(
             load_path='model_params/params.jl',
@@ -177,8 +190,12 @@ class Model(object):
         S = tf.placeholder(tf.float32, [hps.nstates, None, hps.nhidden])
         cells, states, logits = model(X, S, M, reuse=False)
 
-        sess = tf.Session()
-        tf.global_variables_initializer().run(session=sess)
+        sess = tf.InteractiveSession()
+        sess.run(tf.global_variables_initializer())
+
+        # It's unclear to my why this is set up this way.
+        # The original author seems to define functions within the init 
+        # and then attach them as attributes instead of actual methods
 
         def seq_rep(xmb, mmb, smb):
             return sess.run(states, {X: xmb, M: mmb, S: smb})
