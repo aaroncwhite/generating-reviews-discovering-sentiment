@@ -206,7 +206,7 @@ class SentimentNeuron(object):
         def seq_cells(xmb, mmb, smb):
             return sess.run(cells, {X: xmb, M: mmb, S: smb})
 
-        def transform(xs, track_indices=[]):
+        def transform(xs, track_indices=True):
             tstart = time.time()
             xs = [preprocess(x) for x in xs]
             lens = np.asarray([len(x) for x in xs])
@@ -218,7 +218,7 @@ class SentimentNeuron(object):
             offset = 0
             n = len(xs)
             smb = np.zeros((2, n, hps.nhidden), dtype=np.float32)
-            track_indices_values = [[] for i in range(len(track_indices))]
+            track_indices_values = []
             rounded_steps = ceil_round_step(maxlen, nsteps)
             #print "rounded_steps", rounded_steps
             #print "maxlen", maxlen
@@ -256,13 +256,12 @@ class SentimentNeuron(object):
                     #print batch_cells[len(batch_cells)-1][0][2388]
                     #print batch_smb[0][0][2388]
                     #smb[0, offset+start:offset+end, :] = batch_cells[nsteps-1]
-                    if len(track_indices):
+                    if track_indices:
                         #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
-                        for i, index in enumerate(track_indices):
-                            #print "sentiment neuron values -- ", batch_cells[:,0,index]
-                            track_indices_values[i].append(batch_cells[:,0,index])
+                        #print "sentiment neuron values -- ", batch_cells[:,0,index]
+                        track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
 
-            log.debug('Total processed: {}'.format(end))                
+            log.debug('Total processed: {}'.format(len(track_indices_values)))                
             #print "rounded_steps after", rounded_steps
             #print "maxlen after", maxlen
                 
@@ -284,6 +283,8 @@ class SentimentNeuron(object):
                 #print "n subseq is", nsubseq
                 #print "nbatch is", nbatch
                 #print "iterating through each batch for step", step
+
+                # TODO: Why is this almost exactly the same as above???
                 for batch in range(0, nsubseq, nbatch):
                     start = batch
                     end = batch+nbatch
@@ -301,11 +302,10 @@ class SentimentNeuron(object):
                     #print "batch_cells", batch_cells.shape
                     #smb[0, offset+start:offset+end, :] = batch_cells[maxlen-rounded_steps-1]
                     #print "smb----", smb
-                    if len(track_indices):
+                    if track_indices:
                         #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
-                        for i, index in enumerate(track_indices):
-                            #print "sentiment neuron values -- ", batch_cells[:,0,index]
-                            track_indices_values[i].append(batch_cells[:,0,index])
+                        #print "sentiment neuron values -- ", batch_cells[:,0,index]
+                        track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
 
                 #print "done with batch iteration"
             #print "unsort_idxs", unsort_idxs
