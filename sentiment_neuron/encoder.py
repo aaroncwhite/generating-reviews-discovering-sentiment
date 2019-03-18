@@ -220,114 +220,127 @@ class SentimentNeuron(object):
                 float -- a sentiment value 
                 array -- individual character level sentiment scores
             """
+            def _predict(xs, track_indices=track_indices):
+                if not isinstance(xs, list):
+                    xs = list(xs)
+                tstart = time.time()
+                xs = [preprocess(x) for x in xs]
+                lens = np.asarray([len(x) for x in xs])
+                #print lens
+                sorted_idxs = np.argsort(lens)
+                unsort_idxs = np.argsort(sorted_idxs)
+                sorted_xs = [xs[i] for i in sorted_idxs]
+                maxlen = np.max(lens)
+                offset = 0
+                n = len(xs)
+                smb = np.zeros((2, n, hps.nhidden), dtype=np.float32)
+                track_indices_values = []
+                rounded_steps = ceil_round_step(maxlen, nsteps)
+                #print "rounded_steps", rounded_steps
+                #print "maxlen", maxlen
+                for step in range(0, rounded_steps, nsteps):
+                    start = step
+                    end = step+nsteps
+                    #print "start is", start, "and end is", end
+                    xsubseq = [x[start:end] for x in sorted_xs]
+                    ndone = sum([x == b'' for x in xsubseq])
+                    offset += ndone
+                    xsubseq = xsubseq[ndone:]
+                    sorted_xs = sorted_xs[ndone:]
+                    nsubseq = len(xsubseq)
+                    #print "nsubseq is", nsubseq
+                    xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps, 'post')
+                    #print "xmb is", xmb
+                    #print "iterating through each batch for step", step
+                    for batch in range(0, nsubseq, nbatch):
+                        start = batch
+                        end = batch+nbatch
+                        #print "scanning from", start, "to", end
+                        #print "xmb - ", xmb[start:end], xmb.shape
+                        
+                        batch_smb = seq_rep(
+                            xmb[start:end], mmb[start:end],
+                            smb[:, offset+start:offset+end, :])
+                        #print "batch_smb", batch_smb, batch_smb.shape, batch_smb[0][0][2388], batch_smb[1][0][2388]
+                        #smb[:, offset+start:offset+end, :] = batch_smb
+                        batch_cells = seq_cells(
+                            xmb[start:end], mmb[start:end],
+                            smb[:, offset+start:offset+end, :])
+                        smb[:, offset+start:offset+end, :] = batch_smb
+                        #print "batch_cells len", len(batch_cells)
+                        #print batch_cells[len(batch_cells)-1][0][2388]
+                        #print batch_smb[0][0][2388]
+                        #smb[0, offset+start:offset+end, :] = batch_cells[nsteps-1]
+                        if track_indices:
+                            #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
+                            #print "sentiment neuron values -- ", batch_cells[:,0,index]
+                            track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
 
-            tstart = time.time()
-            xs = [preprocess(x) for x in xs]
-            lens = np.asarray([len(x) for x in xs])
-            #print lens
-            sorted_idxs = np.argsort(lens)
-            unsort_idxs = np.argsort(sorted_idxs)
-            sorted_xs = [xs[i] for i in sorted_idxs]
-            maxlen = np.max(lens)
-            offset = 0
-            n = len(xs)
-            smb = np.zeros((2, n, hps.nhidden), dtype=np.float32)
-            track_indices_values = []
-            rounded_steps = ceil_round_step(maxlen, nsteps)
-            #print "rounded_steps", rounded_steps
-            #print "maxlen", maxlen
-            log.debug("Transforming {} example(s)".format(n))
-            for step in range(0, rounded_steps, nsteps):
-                start = step
-                end = step+nsteps
-                #print "start is", start, "and end is", end
-                xsubseq = [x[start:end] for x in sorted_xs]
-                ndone = sum([x == b'' for x in xsubseq])
-                offset += ndone
-                xsubseq = xsubseq[ndone:]
-                sorted_xs = sorted_xs[ndone:]
-                nsubseq = len(xsubseq)
-                #print "nsubseq is", nsubseq
-                xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps, 'post')
-                #print "xmb is", xmb
-                #print "iterating through each batch for step", step
-                for batch in range(0, nsubseq, nbatch):
-                    start = batch
-                    end = batch+nbatch
-                    #print "scanning from", start, "to", end
-                    #print "xmb - ", xmb[start:end], xmb.shape
+                #print "rounded_steps after", rounded_steps
+                #print "maxlen after", maxlen
                     
-                    batch_smb = seq_rep(
-                        xmb[start:end], mmb[start:end],
-                        smb[:, offset+start:offset+end, :])
-                    #print "batch_smb", batch_smb, batch_smb.shape, batch_smb[0][0][2388], batch_smb[1][0][2388]
-                    #smb[:, offset+start:offset+end, :] = batch_smb
-                    batch_cells = seq_cells(
-                        xmb[start:end], mmb[start:end],
-                        smb[:, offset+start:offset+end, :])
-                    smb[:, offset+start:offset+end, :] = batch_smb
-                    #print "batch_cells len", len(batch_cells)
-                    #print batch_cells[len(batch_cells)-1][0][2388]
-                    #print batch_smb[0][0][2388]
-                    #smb[0, offset+start:offset+end, :] = batch_cells[nsteps-1]
-                    if track_indices:
-                        #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
-                        #print "sentiment neuron values -- ", batch_cells[:,0,index]
-                        track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
+                if rounded_steps < maxlen:
+                    start = rounded_steps
+                    end = maxlen
+                    #print "start is", start, "and end is", end
+                    xsubseq = [x[start:end] for x in sorted_xs]
+                    ndone = sum([x == b'' for x in xsubseq])
+                    offset += ndone
+                    xsubseq = xsubseq[ndone:]
+                    sorted_xs = sorted_xs[ndone:]
+                    nsubseq = len(xsubseq)
+                    #print "xsubseq is", xsubseq
+                    xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps, 'post')
+                    #xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps)
+                    #print "xmb is", xmb
+                    #print "mmb is", mmb
+                    #print "n subseq is", nsubseq
+                    #print "nbatch is", nbatch
+                    #print "iterating through each batch for step", step
 
-            log.debug('Total processed: {}'.format(len(track_indices_values)))                
-            #print "rounded_steps after", rounded_steps
-            #print "maxlen after", maxlen
+                    # TODO: Why is this almost exactly the same as above???
+                    for batch in range(0, nsubseq, nbatch):
+                        start = batch
+                        end = batch+nbatch
+                        #print "scanning from", start, "to", end
+                        batch_smb = seq_rep(
+                            xmb[start:end], mmb[start:end],
+                            smb[:, offset+start:offset+end, :])
+                        #print "batch_smb", batch_smb, batch_smb.shape, batch_smb[0][0][2388], batch_smb[1][0][2388]
+                        #print "offset", offset, start, end
+                        #smb[:, offset+start:offset+end, :] = batch_smb
+                        batch_cells = seq_cells(
+                            xmb[start:end], mmb[start:end],
+                            smb[:, offset+start:offset+end, :])
+                        smb[:, offset+start:offset+end, :] = batch_smb
+                        #print "batch_cells", batch_cells.shape
+                        #smb[0, offset+start:offset+end, :] = batch_cells[maxlen-rounded_steps-1]
+                        #print "smb----", smb
+                        if track_indices:
+                            #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
+                            #print "sentiment neuron values -- ", batch_cells[:,0,index]
+                            track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
+
+                    #print "done with batch iteration"
+                #print "unsort_idxs", unsort_idxs
+                #print smb.shape
+                features = smb[0, unsort_idxs, :]
                 
-            if rounded_steps < maxlen:
-                start = rounded_steps
-                end = maxlen
-                #print "start is", start, "and end is", end
-                xsubseq = [x[start:end] for x in sorted_xs]
-                ndone = sum([x == b'' for x in xsubseq])
-                offset += ndone
-                xsubseq = xsubseq[ndone:]
-                sorted_xs = sorted_xs[ndone:]
-                nsubseq = len(xsubseq)
-                #print "xsubseq is", xsubseq
-                xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps, 'post')
-                #xmb, mmb = batch_pad(xsubseq, nsubseq, nsteps)
-                #print "xmb is", xmb
-                #print "mmb is", mmb
-                #print "n subseq is", nsubseq
-                #print "nbatch is", nbatch
-                #print "iterating through each batch for step", step
 
-                # TODO: Why is this almost exactly the same as above???
-                for batch in range(0, nsubseq, nbatch):
-                    start = batch
-                    end = batch+nbatch
-                    #print "scanning from", start, "to", end
-                    batch_smb = seq_rep(
-                        xmb[start:end], mmb[start:end],
-                        smb[:, offset+start:offset+end, :])
-                    #print "batch_smb", batch_smb, batch_smb.shape, batch_smb[0][0][2388], batch_smb[1][0][2388]
-                    #print "offset", offset, start, end
-                    #smb[:, offset+start:offset+end, :] = batch_smb
-                    batch_cells = seq_cells(
-                        xmb[start:end], mmb[start:end],
-                        smb[:, offset+start:offset+end, :])
-                    smb[:, offset+start:offset+end, :] = batch_smb
-                    #print "batch_cells", batch_cells.shape
-                    #smb[0, offset+start:offset+end, :] = batch_cells[maxlen-rounded_steps-1]
-                    #print "smb----", smb
-                    if track_indices:
-                        #print "tracking sentiment..", batch_smb.shape, batch_cells.shape
-                        #print "sentiment neuron values -- ", batch_cells[:,0,index]
-                        track_indices_values.append(batch_cells[:,0,self.sentiment_neuron])
+                # The whole point of this is to just return sentiment scores.
+                # Let's make that easier by already trimming the index values
+                # to a non-padded length matching the input string.
+                # This is a patch for the moment until I can understand more of the
+                # garbage above that has 0 comments and is a mess of loops. 
+                char_sentiment = np.concatenate(track_indices_values)
+                return features[0, self.sentiment_neuron], char_sentiment[0:(len(xs[0]) % nsteps + len(xs[0]) // nsteps * nsteps )]
 
-                #print "done with batch iteration"
-            #print "unsort_idxs", unsort_idxs
-            #print smb.shape
-            features = smb[0, unsort_idxs, :]
-            log.debug('%0.3f seconds to transform %d examples' %
-                  (time.time() - tstart, n))
-            return features, track_indices_values
+            log.debug("Predicting sentiment on {} example(s)".format(len(xs)))
+            start = time()
+            results = [_predict(i) for i in xs]
+            log.debug("Completed sentiment prediction in {} seconds".format(time() - start))
+            return results
+
 
         def cell_transform(xs, indexes=None):
             Fs = []
@@ -346,7 +359,7 @@ class SentimentNeuron(object):
             Fs = np.concatenate(Fs, axis=1).transpose(1, 0, 2)
             return Fs
 
-        self.transform = transform
+        self.predict = predict
         self.cell_transform = cell_transform
         
         def generate_sequence(x_start, override={}, sampling = 0, len_add = '.'):
