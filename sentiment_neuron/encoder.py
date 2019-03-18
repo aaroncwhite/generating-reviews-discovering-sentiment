@@ -409,8 +409,6 @@ class SentimentNeuron(object):
             return(x.decode()) 
         
         
-        self.transform = transform
-        self.cell_transform = cell_transform
         self.generate_sequence = generate_sequence
 
 
