@@ -8,9 +8,10 @@ jupyterlab = "*"
 tqdm = "*"
 scikit-learn = "*"
 pandas = "*"
-matplotlib = "*"
 seaborn = "*"
+tensorflow = "*"
 tensorflow-gpu = "*"
+sentiment-neuron = {editable = true,path = "."}
 
 [dev-packages]
 
