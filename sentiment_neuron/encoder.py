@@ -12,7 +12,7 @@ log.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+formatter = logging.Formatter('%(asctime)s|%(name)s|%(levelname)s| %(message)s')
 handler.setFormatter(formatter)
 log.addHandler(handler)
 
@@ -160,7 +160,9 @@ def batch_pad(xs, nbatch, nsteps, mode='pre'):
     return xmb, mmb'''
 
 
-class Model(object):
+class SentimentNeuron(object):
+
+    sentiment_neuron = 2388
 
     def __init__(self, nbatch=128, nsteps=64):
         log.debug("Rebuilding model...")
@@ -260,7 +262,7 @@ class Model(object):
                             #print "sentiment neuron values -- ", batch_cells[:,0,index]
                             track_indices_values[i].append(batch_cells[:,0,index])
 
-            log.debug('Total processed: {}'.format(step))                
+            log.debug('Total processed: {}'.format(end))                
             #print "rounded_steps after", rounded_steps
             #print "maxlen after", maxlen
                 
