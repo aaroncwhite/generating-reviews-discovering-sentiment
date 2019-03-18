@@ -220,6 +220,7 @@ class Model(object):
             rounded_steps = ceil_round_step(maxlen, nsteps)
             #print "rounded_steps", rounded_steps
             #print "maxlen", maxlen
+            log.debug("Transforming {} example(s)".format(n))
             for step in range(0, rounded_steps, nsteps):
                 start = step
                 end = step+nsteps
@@ -258,7 +259,8 @@ class Model(object):
                         for i, index in enumerate(track_indices):
                             #print "sentiment neuron values -- ", batch_cells[:,0,index]
                             track_indices_values[i].append(batch_cells[:,0,index])
-                            
+
+            log.debug('Total processed: {}'.format(step))                
             #print "rounded_steps after", rounded_steps
             #print "maxlen after", maxlen
                 
@@ -307,7 +309,7 @@ class Model(object):
             #print "unsort_idxs", unsort_idxs
             #print smb.shape
             features = smb[0, unsort_idxs, :]
-            print('%0.3f seconds to transform %d examples' %
+            log.debug('%0.3f seconds to transform %d examples' %
                   (time.time() - tstart, n))
             return features, track_indices_values
 
