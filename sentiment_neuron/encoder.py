@@ -163,7 +163,7 @@ def batch_pad(xs, nbatch, nsteps, mode='pre'):
 class Model(object):
 
     def __init__(self, nbatch=128, nsteps=64):
-        import pdb; pdb.set_trace()
+        log.debug("Rebuilding model...")
         global hps
         hps = HParams(
             load_path='model_params/params.jl',
@@ -184,7 +184,8 @@ class Model(object):
         params[3:6] = []
         
         #print("n steps is", hps.nsteps);
-
+        
+        log.debug("Building TensorFlow graph...")
         X = tf.placeholder(tf.int32, [None, hps.nsteps])
         M = tf.placeholder(tf.float32, [None, hps.nsteps, 1])
         S = tf.placeholder(tf.float32, [hps.nstates, None, hps.nhidden])
@@ -196,7 +197,7 @@ class Model(object):
         # It's unclear to my why this is set up this way.
         # The original author seems to define functions within the init 
         # and then attach them as attributes instead of actual methods
-
+        log.debug("Adding methods...")
         def seq_rep(xmb, mmb, smb):
             return sess.run(states, {X: xmb, M: mmb, S: smb})
 
