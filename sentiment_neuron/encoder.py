@@ -206,7 +206,21 @@ class SentimentNeuron(object):
         def seq_cells(xmb, mmb, smb):
             return sess.run(cells, {X: xmb, M: mmb, S: smb})
 
-        def transform(xs, track_indices=True):
+        def predict(xs, track_indices=True):
+            """Predict the sentiment based on an input list of
+            phrases 
+            
+            Arguments:
+                xs {list like} -- a list of phrases to predict sentiment
+            
+            Keyword Arguments:
+                track_indices {bool} -- track sentiment at the character level (default: {True})
+            
+            Returns:
+                float -- a sentiment value 
+                array -- individual character level sentiment scores
+            """
+
             tstart = time.time()
             xs = [preprocess(x) for x in xs]
             lens = np.asarray([len(x) for x in xs])
