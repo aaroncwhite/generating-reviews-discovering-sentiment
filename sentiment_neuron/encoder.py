@@ -167,6 +167,7 @@ class SentimentNeuron(object):
     def __init__(self, nbatch=128, nsteps=64):
         log.debug("Rebuilding model...")
         global hps
+        self.nsteps = nsteps
         hps = HParams(
             load_path='model_params/params.jl',
             nhidden=4096,
@@ -333,12 +334,12 @@ class SentimentNeuron(object):
                 # This is a patch for the moment until I can understand more of the
                 # garbage above that has 0 comments and is a mess of loops. 
                 char_sentiment = np.concatenate(track_indices_values)
-                return features[0, self.sentiment_neuron], char_sentiment[0:(len(xs[0]) % nsteps + len(xs[0]) // nsteps * nsteps )]
+                return features[0, self.sentiment_neuron], char_sentiment[0:(len(xs[0]) % self.nsteps + (len(xs) // self.nsteps) * self.nsteps )]
 
             log.debug("Predicting sentiment on {} example(s)".format(len(xs)))
-            start = time()
+            start = time.time()
             results = [_predict(i) for i in xs]
-            log.debug("Completed sentiment prediction in {} seconds".format(time() - start))
+            log.debug("Completed sentiment prediction in {} seconds".format(time.time() - start))
             return results
 
 
