@@ -1,7 +1,7 @@
 import time
 import numpy as np
 import tensorflow as tf
-
+import os
 from tqdm import tqdm
 from sklearn.externals import joblib
 
@@ -9,6 +9,8 @@ from utils import HParams, preprocess, iter_data
 
 global nloaded
 nloaded = 0
+
+_MODEL_LOC = os.path.split(__file__)[0]
 
 
 def load_params(shape, dtype, *args, **kwargs):
@@ -164,7 +166,7 @@ class Model(object):
             embd_wn=True,
         )
         global params
-        params = [np.load('model/%d.npy'%i) for i in range(15)]
+        params = [np.load(os.path.join(_MODEL_LOC, 'model/%d.npy'%i)) for i in range(15)]
         params[2] = np.concatenate(params[2:6], axis=1)
         params[3:6] = []
         
