@@ -6,6 +6,7 @@ from tqdm import tqdm
 from sklearn.externals import joblib
 import logging
 import sys
+import progressbar
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -343,7 +344,7 @@ class SentimentNeuron(object):
 
             log.debug("Predicting sentiment on {} example(s)".format(len(xs)))
             start = time.time()
-            results = [_predict(i) for i in xs]
+            results = [_predict(i) for i in progressbar.progressbar(xs)]
             log.debug("Completed sentiment prediction in {} seconds".format(time.time() - start))
             return results
 
