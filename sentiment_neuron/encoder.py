@@ -225,7 +225,7 @@ class SentimentNeuron(object):
                 original_text = preprocess(xs).decode()
 
                 if not isinstance(xs, list):
-                    xs = list(xs)
+                    xs = [xs]
                 tstart = time.time()
                 xs = [preprocess(x) for x in xs]
                 lens = np.asarray([len(x) for x in xs])
@@ -335,11 +335,11 @@ class SentimentNeuron(object):
                 # to a non-padded length matching the input string.
                 # This is a patch for the moment until I can understand more of the
                 # garbage above that has 0 comments and is a mess of loops. 
-                import pdb; pdb.set_trace()
                 char_sentiment = np.concatenate(track_indices_values)
                 return SentimentResult(original_text, 
                                        features[0, self.sentiment_neuron], 
-                                       char_sentiment[0:(len(xs[0]) % self.nsteps + (len(xs) // self.nsteps) * self.nsteps )])
+                                       char_sentiment[0:(len(xs[0]) % self.nsteps + (len(xs[0]) // self.nsteps) * self.nsteps )],
+                                       n_limit = self.nsteps)
 
             log.debug("Predicting sentiment on {} example(s)".format(len(xs)))
             start = time.time()
