@@ -5,11 +5,6 @@ name = "pypi"
 
 [packages]
 jupyterlab = "*"
-tqdm = "*"
-scikit-learn = "*"
-pandas = "*"
-seaborn = "*"
-tensorflow = "*"
 tensorflow-gpu = "*"
 sentiment-neuron = {editable = true,path = "."}
 

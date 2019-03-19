@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "23db9dd26275d2ee2d215f9e8882af03e0357a0ad07960c6354480b75784d684"
+            "sha256": "02e5f4a48d6b545adc40b2f4f4984eb86161c1cbda2a31965678612092f8f864"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -424,7 +424,6 @@
                 "sha256:cc8fc0c7a8d5951dc738f1c1447f71c43734244453616f32b8aa0ef6013a5dfb",
                 "sha256:d7b460bc316064540ce0c41c1438c416a40746fd8a4fb2999668bf18f3c4acf1"
             ],
-            "index": "pypi",
             "version": "==0.24.2"
         },
         "pandocfilters": {
@@ -601,7 +600,6 @@
                 "sha256:f650ddc023c95681fccd5e297820f35de039e008265040c08188be95b3275a0f",
                 "sha256:f7d4b3885ad1a7a6f07719ab6b1790d9892d6d41d973e8d4543a93bb15226fb4"
             ],
-            "index": "pypi",
             "version": "==0.20.3"
         },
         "scipy": {
@@ -642,7 +640,6 @@
                 "sha256:42e627b24e849c2d3bbfd059e00005f6afbc4a76e4895baf44ae23fe8a4b09a5",
                 "sha256:76c83f794ca320fb6b23a7c6192d5e185a5fcf4758966a0c0a54baee46d41e2f"
             ],
-            "index": "pypi",
             "version": "==0.9.0"
         },
         "send2trash": {
@@ -688,7 +685,6 @@
                 "sha256:de0425b58cb34006e4500565239b4c3a3055b95bff132f097fa46c87d8e463c9",
                 "sha256:f21fb65c8e874f40c654bc9b3ff3db3ec26f98f03fe64a541bc768f6f5c52ac2"
             ],
-            "index": "pypi",
             "version": "==1.13.1"
         },
         "tensorflow-estimator": {
@@ -749,7 +745,6 @@
                 "sha256:d385c95361699e5cf7622485d9b9eae2d4864b21cd5a2374a9c381ffed701021",
                 "sha256:e22977e3ebe961f72362f6ddfb9197cc531c9737aaf5f607ef09740c849ecd05"
             ],
-            "index": "pypi",
             "version": "==4.31.1"
         },
         "traitlets": {
