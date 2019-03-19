@@ -1,6 +1,11 @@
 # Sentiment Neuron History
 ------
 
+## 1.1.1 (2019-03-19)
+------
+
+* Add progressbar output to predict method so we know things are happening
+
 ## 1.1.0 (2019-03-18)
 ------
 
