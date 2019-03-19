@@ -18,7 +18,8 @@ requirements = ['pandas',
                 'tqdm',
                 'scikit-learn',
                 'matplotlib',
-                'seaborn', ]
+                'seaborn', 
+                'progressbar2']
 
 setup_requirements = [
                       'setuptools_scm', 
