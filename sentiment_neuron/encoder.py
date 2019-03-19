@@ -17,7 +17,7 @@ handler.setFormatter(formatter)
 log.addHandler(handler)
 
 
-from .utils import HParams, preprocess, iter_data
+from .utils import HParams, preprocess, iter_data, SentimentResult
 
 global nloaded
 nloaded = 0
@@ -212,7 +212,7 @@ class SentimentNeuron(object):
             phrases 
             
             Arguments:
-                xs {list like} -- a list of phrases to predict sentiment
+                xs {text} -- a list of phrases to predict sentiment
             
             Keyword Arguments:
                 track_indices {bool} -- track sentiment at the character level (default: {True})
@@ -222,6 +222,8 @@ class SentimentNeuron(object):
                 array -- individual character level sentiment scores
             """
             def _predict(xs, track_indices=track_indices):
+                original_text = preprocess(xs).decode()
+
                 if not isinstance(xs, list):
                     xs = list(xs)
                 tstart = time.time()
@@ -333,8 +335,11 @@ class SentimentNeuron(object):
                 # to a non-padded length matching the input string.
                 # This is a patch for the moment until I can understand more of the
                 # garbage above that has 0 comments and is a mess of loops. 
+                import pdb; pdb.set_trace()
                 char_sentiment = np.concatenate(track_indices_values)
-                return features[0, self.sentiment_neuron], char_sentiment[0:(len(xs[0]) % self.nsteps + (len(xs) // self.nsteps) * self.nsteps )]
+                return SentimentResult(original_text, 
+                                       features[0, self.sentiment_neuron], 
+                                       char_sentiment[0:(len(xs[0]) % self.nsteps + (len(xs) // self.nsteps) * self.nsteps )])
 
             log.debug("Predicting sentiment on {} example(s)".format(len(xs)))
             start = time.time()

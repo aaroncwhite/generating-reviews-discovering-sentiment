@@ -5,6 +5,40 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.linear_model import LogisticRegression
 
+class SentimentResult(object):
+    """A sentiment result object with an overall sentiment score
+    and individual character level results.
+    """
+
+    def __init__(self, text, sentiment, char_sentiment):
+        """Initializes a results object to store text, sentiment score
+        and character level scores together in one place.
+        
+        Arguments:
+            text {str} -- A string that was encoded by the model
+            sentiment {float} -- A sentiment score
+            char_sentiment {list of float} -- list of floats describing 
+                sentiment of the character sequence
+
+        """ 
+        self.text = text
+        self.sentiment = sentiment
+        self.char_sentiment = char_sentiment
+    
+    def __repr__(self):
+        if len(self.text) > 15 :
+            text = "{}...".format(self.text[0:10]) 
+        else:
+            text= self.text
+
+        return "{}: {}".format(self.sentiment, text)
+
+    def to_dict(self):
+        return self.__dict__
+
+
+
+
 def train_with_reg_cv(trX, trY, vaX, vaY, teX=None, teY=None, penalty='l1',
         C=2**np.arange(-8, 1).astype(np.float), seed=42):
     scores = []
