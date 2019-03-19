@@ -4,13 +4,18 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.linear_model import LogisticRegression
+from matplotlib import pyplot as plt
+import seaborn as sns
+import numpy as np
+
+plt.style.use('ggplot')
 
 class SentimentResult(object):
     """A sentiment result object with an overall sentiment score
     and individual character level results.
     """
 
-    def __init__(self, text, sentiment, char_sentiment):
+    def __init__(self, text, sentiment, char_sentiment, n_limit=64):
         """Initializes a results object to store text, sentiment score
         and character level scores together in one place.
         
@@ -24,6 +29,7 @@ class SentimentResult(object):
         self.text = text
         self.sentiment = sentiment
         self.char_sentiment = char_sentiment
+        self.n_limit = n_limit
     
     def __repr__(self):
         if len(self.text) > 15 :
@@ -35,6 +41,35 @@ class SentimentResult(object):
 
     def to_dict(self):
         return self.__dict__
+
+    def plot(self):
+        values = self.char_sentiment.flatten()
+        preprocessed_text = self.text
+        n_limit = self.n_limit
+        num_chars = len(preprocessed_text)
+
+        for i in np.arange(0, len(values), n_limit):
+            if i + n_limit > num_chars:
+                end_index = num_chars
+                # We've reached a shorter than n_limit number of 
+                # characters to display, so pad the output results with
+                # empty strings and 0s so we can make the plot look even
+                n_missing = n_limit - (end_index % n_limit)
+                add_chars = ' ' * n_missing
+                add_points = np.zeros((n_missing,))
+
+            else:
+                # Set defaults here so the plotting process does not break
+                end_index = i+n_limit
+                add_chars = ''
+                add_points = []
+            
+            values_limited = np.concatenate([values[i:end_index], add_points])
+            data = values_limited.reshape((1, min([n_limit, len(values_limited)])))
+            labels = np.array([x for x in preprocessed_text[i:end_index] + add_chars]).reshape((1, min([n_limit, len(values_limited)])))
+            fig, ax = plt.subplots(figsize=(20,0.5))
+            ax = sns.heatmap(data, annot = labels, fmt = '', annot_kws={"size":15}, vmin=-1, vmax=1, cmap='RdYlGn')
+    
 
 
 
