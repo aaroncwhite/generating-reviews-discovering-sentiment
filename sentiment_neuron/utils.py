@@ -32,12 +32,7 @@ class SentimentResult(object):
         self.n_limit = n_limit
     
     def __repr__(self):
-        if len(self.text) > 15 :
-            text = "{}...".format(self.text[0:10]) 
-        else:
-            text= self.text
-
-        return "{}: {}".format(self.sentiment, text)
+        return repr(self.sentiment)
 
     def to_dict(self):
         return self.__dict__
