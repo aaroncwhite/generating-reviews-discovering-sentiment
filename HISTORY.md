@@ -1,6 +1,11 @@
 # Sentiment Neuron History
 ------
 
+## 1.1.2 (2019-03-20)
+------
+
+* Fix issue in SentimentResult.plot() cutting off final row of characters
+
 ## 1.1.1 (2019-03-19)
 ------
 
