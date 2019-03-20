@@ -65,6 +65,7 @@ class SentimentResult(object):
             fig, ax = plt.subplots(figsize=(20,0.5))
             ax = sns.heatmap(data, annot = labels, fmt = '', annot_kws={"size":15}, vmin=-1, vmax=1, cmap='RdYlGn')
     
+        return plt.figure()
 
 
 
