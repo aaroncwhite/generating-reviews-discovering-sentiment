@@ -37,13 +37,15 @@ class SentimentResult(object):
     def to_dict(self):
         return self.__dict__
 
-    def plot(self):
+     def plot(self, filename=None):
         values = self.char_sentiment.flatten()
         preprocessed_text = self.text
         n_limit = self.n_limit
         num_chars = len(preprocessed_text)
 
-        for i in np.arange(0, len(values), n_limit):
+        i = 0
+        while i < num_chars:
+ 
             if i + n_limit > num_chars:
                 end_index = num_chars
                 # We've reached a shorter than n_limit number of 
@@ -64,7 +66,15 @@ class SentimentResult(object):
             labels = np.array([x for x in preprocessed_text[i:end_index] + add_chars]).reshape((1, min([n_limit, len(values_limited)])))
             fig, ax = plt.subplots(figsize=(20,0.5))
             ax = sns.heatmap(data, annot = labels, fmt = '', annot_kws={"size":15}, vmin=-1, vmax=1, cmap='RdYlGn')
-    
+            
+            i+=n_limit
+            
+
+        if filename:
+            fig.savefig(filename)
+        fig = plt.figure()
+        plt.close()
+        return fig
 
 
 
