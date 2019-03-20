@@ -1,6 +1,11 @@
 # Sentiment Neuron History
 ------
 
+## 1.1.3 (2019-03-20)
+------
+
+* Fix typo that broke plot
+
 ## 1.1.2 (2019-03-20)
 ------
 

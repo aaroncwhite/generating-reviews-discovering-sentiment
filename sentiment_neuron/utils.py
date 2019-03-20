@@ -37,7 +37,7 @@ class SentimentResult(object):
     def to_dict(self):
         return self.__dict__
 
-     def plot(self, filename=None):
+    def plot(self, filename=None):
         values = self.char_sentiment.flatten()
         preprocessed_text = self.text
         n_limit = self.n_limit
